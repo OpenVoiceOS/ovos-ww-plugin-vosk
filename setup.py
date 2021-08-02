@@ -2,18 +2,17 @@
 from setuptools import setup
 
 
-PLUGIN_ENTRY_POINT = 'vosk_ww_plug=jarbas_wake_word_plugin_vosk' \
-                     ':VoskWakeWordPlugin'
+PLUGIN_ENTRY_POINT = 'ovos-ww-plugin-vosk=ovos_ww_plugin_vosk:VoskWakeWordPlugin'
 setup(
-    name='jarbas-wake-word-plugin-vosk',
-    version='0.1',
+    name='ovos-ww-plugin-vosk',
+    version='0.1.0',
     description='Kaldi wake word plugin for mycroft',
-    url='https://github.com/JarbasLingua/jarbas-wake-word-plugin-vosk',
+    url='https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk',
     author='JarbasAi',
     author_email='jarbasai@mailfence.com',
     license='Apache-2.0',
-    packages=['jarbas_wake_word_plugin_vosk'],
-    install_requires=["numpy", "vosk"],
+    packages=['ovos_ww_plugin_vosk'],
+    install_requires=["numpy", "vosk", "ovos-plugin-manager>=0.0.1a7"],
     zip_safe=True,
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -32,6 +31,6 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],
-    keywords='mycroft plugin wake word',
+    keywords='mycroft ovos plugin wake word',
     entry_points={'mycroft.plugin.wake_word': PLUGIN_ENTRY_POINT}
 )

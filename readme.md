@@ -1,13 +1,9 @@
 ## Description
 Mycroft wake word plugin for [Vosk](https://alphacephei.com/vosk/)
 
-The "plugins" are pip install-able modules that provide new engines for mycroft
-
-more info in the [docs](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mycroft-core/plugins)
-
 ## Install
 
-`mycroft-pip install jarbas-wake-word-plugin-vosk`
+`pip install ovos-ww-plugin-vosk`
 
 You can download official models from [alphacephei](https://alphacephei.com/vosk/models)
 
@@ -25,7 +21,7 @@ Add the following to your hotwords section in mycroft.conf
  },
   "hotwords": {
     "hey_computer": {
-        "module": "vosk_ww_plug",
+        "module": "ovos-ww-plugin-vosk",
         "model_folder": "path/to/model/folder"
     }
   }
@@ -58,7 +54,7 @@ Lower values will decrease performance, higher values will decrease accuracy, de
  },
   "hotwords": {
     "hey_computer": {
-        "module": "vosk_ww_plug",
+        "module": "ovos-ww-plugin-vosk",
         "rule": "equals",
         "debug": false,
         "samples": ["hey computer", "a computer", "hey computed"],

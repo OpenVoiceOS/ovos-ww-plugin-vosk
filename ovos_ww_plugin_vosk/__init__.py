@@ -13,8 +13,8 @@
 from os.path import isdir
 import json
 from vosk import Model as KaldiModel, KaldiRecognizer
-from mycroft.util.log import LOG
-from mycroft.client.speech.hotword_factory import HotWordEngine
+from ovos_utils.log import LOG
+from ovos_plugin_manager.templates.hotwords import HotWordEngine
 
 
 class VoskWakeWordPlugin(HotWordEngine):
