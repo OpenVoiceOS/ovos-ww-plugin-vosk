@@ -26,7 +26,7 @@ class VoskWakeWordPlugin(HotWordEngine):
     def __init__(self, hotword="hey mycroft", config=None, lang="en-us"):
         config = config or {}
         super(VoskWakeWordPlugin, self).__init__(hotword, config, lang)
-        model_path = self.config.get("model_folder")
+        model_path = self.config.get("model") or self.config.get("model_folder")
         if not model_path or not isdir(model_path):
             LOG.error("You need to provide a valid model folder")
             LOG.info(
