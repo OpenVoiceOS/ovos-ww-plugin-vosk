@@ -50,7 +50,10 @@ def required(requirements_file):
 
 
 
-PLUGIN_ENTRY_POINT = 'ovos-ww-plugin-vosk=ovos_ww_plugin_vosk:VoskWakeWordPlugin'
+PLUGIN_ENTRY_POINT = (
+    'ovos-ww-plugin-vosk=ovos_ww_plugin_vosk:VoskWakeWordPlugin',
+    'ovos-ww-plugin-vosk-multi=ovos_ww_plugin_vosk:VoskMultiWakeWordPlugin'
+)
 
 setup(
     name='ovos-ww-plugin-vosk',

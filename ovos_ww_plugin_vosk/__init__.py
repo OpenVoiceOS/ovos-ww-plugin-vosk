@@ -70,19 +70,19 @@ class ModelContainer:
             audio = audio.get_wav_data()
         return engine.AcceptWaveform(audio)
 
-    def get_model(self, model_path):
+    def get_model(self, model_path, samples=None):
         if model_path:
             if self.full_vocab:
                 model = KaldiRecognizer(KaldiModel(model_path), 16000)
             else:
                 model = KaldiRecognizer(KaldiModel(model_path), 16000,
-                                        json.dumps(self.samples))
+                                        json.dumps(samples or self.samples))
             return model
         else:
             raise FileNotFoundError
 
     def load_model(self, model_path):
-        self.engine = self.get_model(model_path)
+        self.engine = self.get_model(model_path, self.samples)
 
     def load_language(self, lang):
         lang = lang.split("-")[0].lower()
@@ -154,46 +154,6 @@ class ModelContainer:
         return lang2url.get(lang)
 
 
-class MultiLangModelContainer(ModelContainer):
-    engines = {}
-    models = {}
-
-    def __init__(self, samples=None, full_vocab=False, default_lang="en-us"):
-        # no super on purpose
-        if not full_vocab and not samples:
-            full_vocab = True
-        samples = samples or []
-        if self.UNK not in samples:
-            samples.append(self.UNK)
-        self.samples = samples
-        self.full_vocab = full_vocab
-        self.default_lang = default_lang
-
-    def get_engine(self, lang=None):
-        lang = lang or self.default_lang
-        lang = lang.split("-")[0].lower()
-        self.load_language(lang)
-        return self.engines[lang]
-
-    def load_model(self, model_path, lang=None):
-        lang = lang or self.default_lang
-        lang = lang.split("-")[0].lower()
-        self.models[lang] = model_path
-        self.engines[lang] = self.get_model(model_path)
-
-    def load_language(self, lang):
-        lang = lang.split("-")[0].lower()
-        if lang in self.engines:
-            return
-        model_path = self.download_language(lang)
-        self.load_model(model_path, lang)
-
-    def unload_language(self, lang):
-        if lang in self.engines:
-            del self.engines[lang]
-            self.engines.pop(lang)
-
-
 class VoskWakeWordPlugin(HotWordEngine):
     """Vosk Wake Word"""
     # Hard coded values in mycroft/client/speech/mic.py
@@ -234,74 +194,176 @@ class VoskWakeWordPlugin(HotWordEngine):
         if self._counter < self.time_between_checks:
             return False
         self._counter = 0
-        self.model.process_audio(frame_data, self.lang)
-        transcript = self.model.get_final_transcription(self.lang)
+        try:
+            self.model.process_audio(frame_data, self.lang)
+            transcript = self.model.get_final_transcription(self.lang)
+        except:
+            LOG.error("Failed to process audio")
+            return False
         if not transcript or transcript == self.model.UNK:
             return False
         if self.debug:
-            LOG.info("TRANSCRIPT: " + transcript)
-        for s in self.samples:
+            LOG.debug("TRANSCRIPT: " + transcript)
+        return self.apply_rules(transcript, self.samples, self.rule, self.thresh)
+
+    @classmethod
+    def apply_rules(cls, transcript, samples, rule=MatchRule.FUZZY, thresh=0.75):
+        for s in samples:
             s = s.lower().strip()
-            if self.rule == MatchRule.FUZZY:
+            if rule == MatchRule.FUZZY:
                 score = fuzzy_match(s, transcript)
-                if score >= self.thresh:
+                if score >= thresh:
                     return True
-            elif self.rule == MatchRule.TOKEN_SORT_RATIO:
+            elif rule == MatchRule.TOKEN_SORT_RATIO:
                 score = fuzzy_match(s, transcript,
                                     strategy=MatchStrategy.TOKEN_SORT_RATIO)
-                if score >= self.thresh:
+                if score >= thresh:
                     return True
-            elif self.rule == MatchRule.TOKEN_SET_RATIO:
+            elif rule == MatchRule.TOKEN_SET_RATIO:
                 score = fuzzy_match(s, transcript,
                                     strategy=MatchStrategy.TOKEN_SET_RATIO)
-                if score >= self.thresh:
+                if score >= thresh:
                     return True
-            elif self.rule == MatchRule.PARTIAL_TOKEN_SORT_RATIO:
+            elif rule == MatchRule.PARTIAL_TOKEN_SORT_RATIO:
                 score = fuzzy_match(s, transcript,
                                     strategy=MatchStrategy.PARTIAL_TOKEN_SORT_RATIO)
-                if score >= self.thresh:
+                if score >= thresh:
                     return True
-            elif self.rule == MatchRule.PARTIAL_TOKEN_SET_RATIO:
+            elif rule == MatchRule.PARTIAL_TOKEN_SET_RATIO:
                 score = fuzzy_match(s, transcript,
                                     strategy=MatchStrategy.PARTIAL_TOKEN_SET_RATIO)
-                if score >= self.thresh:
+                if score >= thresh:
                     return True
-            elif self.rule == MatchRule.CONTAINS:
+            elif rule == MatchRule.CONTAINS:
                 if s in transcript:
                     return True
-            elif self.rule == MatchRule.EQUALS:
+            elif rule == MatchRule.EQUALS:
                 if s == transcript:
                     return True
-            elif self.rule == MatchRule.STARTS:
+            elif rule == MatchRule.STARTS:
                 if transcript.startswith(s):
                     return True
-            elif self.rule == MatchRule.ENDS:
+            elif rule == MatchRule.ENDS:
                 if transcript.endswith(s):
                     return True
         return False
 
-    def update(self, chunk):
-        """ In here you have access to live audio chunks, allows for
-        streaming predictions, result still need to be returned in
-        found_wake_word method """
 
-    def stop(self):
-        """ Perform any actions needed to shut down the hot word engine.
+class MultiLangModelContainer(ModelContainer):
+    engines = {}
+    models = {}
+    lang_samples = {}
 
-            This may include things such as unload loaded data or shutdown
-            external processes.
-        """
+    def __init__(self, lang_samples=None, full_vocab=False, default_lang="en"):
+        # no super on purpose
+        if not full_vocab and not lang_samples:
+            full_vocab = True
+        lang = default_lang.split("-")[0].lower()
+        self.lang_samples = lang_samples or {lang: [self.UNK]}
+        self.samples = lang_samples[lang]
+        self.full_vocab = full_vocab
+        self.default_lang = default_lang
+
+    def get_engine(self, lang=None):
+        lang = lang or self.default_lang
+        lang = lang.split("-")[0].lower()
+        self.load_language(lang)
+        return self.engines[lang]
+
+    def load_model(self, model_path, lang=None):
+        lang = lang or self.default_lang
+        lang = lang.split("-")[0].lower()
+        self.models[lang] = model_path
+        samples = self.lang_samples.get(lang)
+        self.engines[lang] = self.get_model(model_path, samples)
+
+    def load_language(self, lang):
+        lang = lang.split("-")[0].lower()
+        if lang in self.engines:
+            return
+        model_path = self.download_language(lang)
+        self.load_model(model_path, lang)
+
+    def unload_language(self, lang):
+        if lang in self.engines:
+            del self.engines[lang]
+            self.engines.pop(lang)
 
 
 class VoskMultiWakeWordPlugin(VoskWakeWordPlugin):
-    """ WIP - do not use
-
+    """
      keeps multiple models in memory and runs detections for multiple wake words
-     this avoids loading more than 1 model per language, otherwise each wake word loads its own
+     this avoids loading more than 1 model per language
      """
+    # Hard coded values in mycroft/client/speech/mic.py
+    SEC_BETWEEN_WW_CHECKS = 0.2
+    MAX_EXPECTED_DURATION = 3  # seconds of data chunks received at a time
+
+    def __init__(self, hotword="hey mycroft", config=None, lang="en-us"):
+        config = config or {}
+        super(VoskWakeWordPlugin, self).__init__(hotword, config, lang)
+        self.keywords = self.config.get("keywords", {})
+        self.expected_duration = self.MAX_EXPECTED_DURATION
+        self.full_vocab = self.config.get("full_vocab", False)
+        self.debug = self.config.get("debug", False) or True
+        self.time_between_checks = min(self.config.get("time_between_checks", 0.5), 3)
+        self._counter = 0
+        self._load_model()
+
+    @property
+    def langs(self):
+        langs = [kw.get("lang", self.lang) for kw in self.keywords.values()]
+        return list(set(langs))
+
+    @property
+    def samples(self):
+        samples = {lang.split("-")[0].lower(): [] for lang in self.langs}
+        for kw_name, kw in self.keywords.items():
+            kw_name = kw_name.replace("_", " ").replace("-", " ")
+            lang = kw.get("lang") or self.lang
+            lang = lang.split("-")[0].lower()
+            samples[lang] += kw.get("samples", [kw_name])
+        return samples
+
     def _load_model(self):
         # keeps several models in memory per language
         self.model = MultiLangModelContainer(self.samples,
                                              self.full_vocab,
                                              self.lang)
-        self.model.load_language(self.lang)
+        for lang in self.langs:
+            self.model.load_language(lang)
+
+    def found_wake_word(self, frame_data):
+        """ frame data contains audio data that needs to be checked for a wake
+        word, you can process audio here or just return a result
+        previously handled in update method """
+        self._counter += self.SEC_BETWEEN_WW_CHECKS
+        if self._counter < self.time_between_checks:
+            return False
+        self._counter = 0
+        txs = {}
+        for kw_name, kw in self.keywords.items():
+            lang = kw.get("lang") or self.lang
+            if lang in txs:
+                transcript = txs[lang]
+            else:
+                try:
+                    self.model.process_audio(frame_data, lang)
+                    transcript = self.model.get_final_transcription(lang)
+                except:
+                    LOG.error(f"Failed to process audio for lang: {lang}")
+                    continue
+            if not transcript or transcript == self.model.UNK:
+                continue
+            if self.debug:
+                LOG.debug(f"TRANSCRIPT {lang}: " + transcript)
+            samples = kw.get("samples") or [kw_name.replace("_", " ").replace("-", " ")]
+            rule = kw.get("rule") or MatchRule.EQUALS
+            thresh = kw.get("threshold", 0.75)
+            found = VoskWakeWordPlugin.apply_rules(transcript, samples, rule, thresh)
+            if found:
+                LOG.info(f"Detected kw: {kw_name}")
+                if self.debug:
+                    LOG.debug(str(kw))
+                return True
+        return False
