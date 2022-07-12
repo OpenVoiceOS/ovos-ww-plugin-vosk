@@ -37,8 +37,6 @@ class MatchRule(str, enum.Enum):
 
 class ModelContainer:
     UNK = "[unk]"
-    engines = {}
-    models = {}
 
     def __init__(self, samples=None, full_vocab=False):
         if not full_vocab and not samples:
@@ -48,52 +46,48 @@ class ModelContainer:
             samples.append(self.UNK)
         self.samples = samples
         self.full_vocab = full_vocab
+        self.engine = None
 
-    def get_engine(self, lang):
-        lang = lang.split("-")[0].lower()
-        self.load_language(lang)
-        return self.engines[lang]
+    def get_engine(self, lang=None):
+        if not self.engine and lang:
+            lang = lang.split("-")[0].lower()
+            self.load_language(lang)
+        return self.engine
 
-    def get_partial_transcription(self, lang):
+    def get_partial_transcription(self, lang=None):
         engine = self.get_engine(lang)
         res = engine.PartialResult()
         return json.loads(res)["partial"]
 
-    def get_final_transcription(self, lang):
+    def get_final_transcription(self, lang=None):
         engine = self.get_engine(lang)
         res = engine.FinalResult()
         return json.loads(res)["text"]
 
-    def process_audio(self, audio, lang):
+    def process_audio(self, audio, lang=None):
         engine = self.get_engine(lang)
         if isinstance(audio, AudioData):
             audio = audio.get_wav_data()
         return engine.AcceptWaveform(audio)
 
-    def load_model(self, model_path, lang):
-        lang = lang.split("-")[0].lower()
-        self.models[lang] = model_path
+    def get_model(self, model_path):
         if model_path:
             if self.full_vocab:
                 model = KaldiRecognizer(KaldiModel(model_path), 16000)
             else:
                 model = KaldiRecognizer(KaldiModel(model_path), 16000,
                                         json.dumps(self.samples))
-            self.engines[lang] = model
+            return model
         else:
             raise FileNotFoundError
 
+    def load_model(self, model_path):
+        self.engine = self.get_model(model_path)
+
     def load_language(self, lang):
         lang = lang.split("-")[0].lower()
-        if lang in self.engines:
-            return
         model_path = self.download_language(lang)
-        self.load_model(model_path, lang)
-
-    def unload_language(self, lang):
-        if lang in self.engines:
-            del self.engines[lang]
-            self.engines.pop(lang)
+        self.load_model(model_path)
 
     @staticmethod
     def download_language(lang):
@@ -169,8 +163,6 @@ class VoskWakeWordPlugin(HotWordEngine):
     def __init__(self, hotword="hey mycroft", config=None, lang="en-us"):
         config = config or {}
         super(VoskWakeWordPlugin, self).__init__(hotword, config, lang)
-        # model_folder for backwards compat
-        model_path = self.config.get("model") or self.config.get("model_folder")
         default_sample = [hotword.replace("_", " ").replace("-", " ")]
         self.full_vocab = self.config.get("full_vocab", False)
         self.samples = self.config.get("samples", default_sample)
@@ -181,12 +173,16 @@ class VoskWakeWordPlugin(HotWordEngine):
             min(self.config.get("time_between_checks", 0.5), 3)
         self.expected_duration = self.MAX_EXPECTED_DURATION
         self._counter = 0
+        self._load_model()
 
+    def _load_model(self):
+        # model_folder for backwards compat
+        model_path = self.config.get("model") or self.config.get("model_folder")
         self.model = ModelContainer(self.samples, self.full_vocab)
         if model_path:
             if model_path.startswith("http"):
                 model_path = ModelContainer.download_model(model_path)
-            self.model.load_model(model_path, self.lang)
+            self.model.load_model(model_path)
         else:
             self.model.load_language(self.lang)
 
@@ -255,3 +251,4 @@ class VoskWakeWordPlugin(HotWordEngine):
             This may include things such as unload loaded data or shutdown
             external processes.
         """
+
