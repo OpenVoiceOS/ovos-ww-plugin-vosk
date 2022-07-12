@@ -10,9 +10,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import enum
 import json
 from os.path import join, exists
-import enum
+
 from ovos_plugin_manager.templates.hotwords import HotWordEngine
 from ovos_skill_installer import download_extract_zip, download_extract_tar
 from ovos_utils.log import LOG
@@ -206,27 +207,27 @@ class VoskWakeWordPlugin(HotWordEngine):
         for s in self.samples:
             s = s.lower().strip()
             if self.rule == MatchRule.FUZZY:
-                _, score = fuzzy_match(s, transcript)
+                score = fuzzy_match(s, transcript)
                 if score >= self.thresh:
                     return True
             elif self.rule == MatchRule.TOKEN_SORT_RATIO:
-                _, score = fuzzy_match(s, transcript,
-                                       strategy=MatchStrategy.TOKEN_SORT_RATIO)
+                score = fuzzy_match(s, transcript,
+                                    strategy=MatchStrategy.TOKEN_SORT_RATIO)
                 if score >= self.thresh:
                     return True
             elif self.rule == MatchRule.TOKEN_SET_RATIO:
-                _, score = fuzzy_match(s, transcript,
-                                       strategy=MatchStrategy.TOKEN_SET_RATIO)
+                score = fuzzy_match(s, transcript,
+                                    strategy=MatchStrategy.TOKEN_SET_RATIO)
                 if score >= self.thresh:
                     return True
             elif self.rule == MatchRule.PARTIAL_TOKEN_SORT_RATIO:
-                _, score = fuzzy_match(s, transcript,
-                                       strategy=MatchStrategy.PARTIAL_TOKEN_SORT_RATIO)
+                score = fuzzy_match(s, transcript,
+                                    strategy=MatchStrategy.PARTIAL_TOKEN_SORT_RATIO)
                 if score >= self.thresh:
                     return True
             elif self.rule == MatchRule.PARTIAL_TOKEN_SET_RATIO:
-                _, score = fuzzy_match(s, transcript,
-                                       strategy=MatchStrategy.PARTIAL_TOKEN_SET_RATIO)
+                score = fuzzy_match(s, transcript,
+                                    strategy=MatchStrategy.PARTIAL_TOKEN_SET_RATIO)
                 if score >= self.thresh:
                     return True
             elif self.rule == MatchRule.CONTAINS:
