@@ -255,14 +255,13 @@ class MultiLangModelContainer(ModelContainer):
     lang_samples = {}
 
     def __init__(self, lang_samples=None, full_vocab=False, default_lang="en"):
-        # no super on purpose
         if not full_vocab and not lang_samples:
             full_vocab = True
         lang = default_lang.split("-")[0].lower()
         self.lang_samples = lang_samples or {lang: [self.UNK]}
-        self.samples = lang_samples[lang]
-        self.full_vocab = full_vocab
+        samples = lang_samples[lang]
         self.default_lang = default_lang
+        super().__init__(samples, full_vocab)
 
     def get_engine(self, lang=None):
         lang = lang or self.default_lang
@@ -290,7 +289,7 @@ class MultiLangModelContainer(ModelContainer):
             self.engines.pop(lang)
 
 
-class VoskMultiWakeWordPlugin(VoskWakeWordPlugin):
+class VoskMultiWakeWordPlugin(HotWordEngine):
     """
      keeps multiple models in memory and runs detections for multiple wake words
      this avoids loading more than 1 model per language
@@ -299,14 +298,14 @@ class VoskMultiWakeWordPlugin(VoskWakeWordPlugin):
     SEC_BETWEEN_WW_CHECKS = 0.2
     MAX_EXPECTED_DURATION = 3  # seconds of data chunks received at a time
 
-    def __init__(self, hotword="hey mycroft", config=None, lang="en-us"):
+    def __init__(self, hotword="hey xxx", config=None, lang="en-us"):
         config = config or {}
-        super(VoskWakeWordPlugin, self).__init__(hotword, config, lang)
+        super().__init__(hotword, config, lang)
         self.keywords = self.config.get("keywords", {})
         self.expected_duration = self.MAX_EXPECTED_DURATION
         self.full_vocab = self.config.get("full_vocab", False)
         self.debug = self.config.get("debug", False) or True
-        self.time_between_checks = min(self.config.get("time_between_checks", 0.5), 3)
+        self.time_between_checks = min(self.config.get("time_between_checks", 0.8), 3)
         self._counter = 0
         self._load_model()
 
