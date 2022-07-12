@@ -5,27 +5,24 @@ Mycroft wake word plugin for [Vosk](https://alphacephei.com/vosk/)
 
 `pip install ovos-ww-plugin-vosk`
 
-You can download official models from [alphacephei](https://alphacephei.com/vosk/models)
-
-Models for Iberian Languages can be found [here](https://github.com/JarbasIberianLanguageResources/iberian-vosk) 
-
-Using a small model is HIGHLY recommended
-
 ## Configuration
 
 Add the following to your hotwords section in mycroft.conf 
 
 ```json
- "listener": {
-      "wake_word": "hey_computer"
- },
+  "listener": {
+    "wake_word": "hey_computer"
+  },
   "hotwords": {
     "hey_computer": {
         "module": "ovos-ww-plugin-vosk",
-        "model_folder": "path/to/model/folder"
+        "listen": true
     }
   }
 ```
+replace `hey_computer` with your wake word and thats all!
+
+a model wil be automatically downloaded for configured language
 
 ### Advanced config
 
@@ -48,15 +45,21 @@ You can try to improve performance by tweaking `time_between_checks`, this is th
 
 Lower values will decrease performance, higher values will decrease accuracy, default value is 0.5
 
+set `full_vocab` to transcribe all known words before applying detection rules, by default this is false and the plugin will only look for the wake word samples, depending on wake word this may improve or decrease accuracy
+
+You can download official models from [alphacephei](https://alphacephei.com/vosk/models) and explicitly define them under `model_folder`
+
 ```json
- "listener": {
-      "wake_word": "hey_computer"
- },
+  "listener": {
+    "wake_word": "hey_computer"
+  },
   "hotwords": {
     "hey_computer": {
         "module": "ovos-ww-plugin-vosk",
+        "listen": true,
+        "full_vocab": true,
         "rule": "equals",
-        "debug": false,
+        "debug": true,
         "samples": ["hey computer", "a computer", "hey computed"],
         "model_folder": "/home/user/Downloads/vosk-model-small-en-us-0.4",
         "time_between_checks": 0.6
