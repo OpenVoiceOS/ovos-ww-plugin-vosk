@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/HEAD)
+## [V0.0.2a2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.0.2a2) (2022-07-12)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/ecde463b30d9f62ff33de38e7b832a8a1871100a...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/ecde463b30d9f62ff33de38e7b832a8a1871100a...V0.0.2a2)
 
 **Implemented enhancements:**
 
