@@ -154,6 +154,46 @@ class ModelContainer:
         return lang2url.get(lang)
 
 
+class MultiLangModelContainer(ModelContainer):
+    engines = {}
+    models = {}
+
+    def __init__(self, samples=None, full_vocab=False, default_lang="en-us"):
+        # no super on purpose
+        if not full_vocab and not samples:
+            full_vocab = True
+        samples = samples or []
+        if self.UNK not in samples:
+            samples.append(self.UNK)
+        self.samples = samples
+        self.full_vocab = full_vocab
+        self.default_lang = default_lang
+
+    def get_engine(self, lang=None):
+        lang = lang or self.default_lang
+        lang = lang.split("-")[0].lower()
+        self.load_language(lang)
+        return self.engines[lang]
+
+    def load_model(self, model_path, lang=None):
+        lang = lang or self.default_lang
+        lang = lang.split("-")[0].lower()
+        self.models[lang] = model_path
+        self.engines[lang] = self.get_model(model_path)
+
+    def load_language(self, lang):
+        lang = lang.split("-")[0].lower()
+        if lang in self.engines:
+            return
+        model_path = self.download_language(lang)
+        self.load_model(model_path, lang)
+
+    def unload_language(self, lang):
+        if lang in self.engines:
+            del self.engines[lang]
+            self.engines.pop(lang)
+
+
 class VoskWakeWordPlugin(HotWordEngine):
     """Vosk Wake Word"""
     # Hard coded values in mycroft/client/speech/mic.py
@@ -252,3 +292,16 @@ class VoskWakeWordPlugin(HotWordEngine):
             external processes.
         """
 
+
+class VoskMultiWakeWordPlugin(VoskWakeWordPlugin):
+    """ WIP - do not use
+
+     keeps multiple models in memory and runs detections for multiple wake words
+     this avoids loading more than 1 model per language, otherwise each wake word loads its own
+     """
+    def _load_model(self):
+        # keeps several models in memory per language
+        self.model = MultiLangModelContainer(self.samples,
+                                             self.full_vocab,
+                                             self.lang)
+        self.model.load_language(self.lang)
