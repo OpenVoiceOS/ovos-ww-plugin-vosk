@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/HEAD)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.0.2...HEAD)
+
+**Implemented enhancements:**
+
+- use vosk keyword list [\#1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/issues/1)
+- Feat/multiww wakeup [\#3](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/3) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.0.2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.0.2) (2022-07-12)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.0.2a2...V0.0.2)
+
 ## [V0.0.2a2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.0.2a2) (2022-07-12)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/ecde463b30d9f62ff33de38e7b832a8a1871100a...V0.0.2a2)
