@@ -1,3 +1,0 @@
-numpy
-vosk
-ovos-plugin-manager>=0.0.1a7,~=0.0
