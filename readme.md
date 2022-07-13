@@ -73,16 +73,33 @@ TIP: enable `debug` flag and check logs for what is being transcribed, then fine
 
 Each wake word must fit in 3 seconds, which is the length of audio the model parses at a time
 
-You can try to improve performance by tweaking `time_between_checks`, Lower values will decrease performance, higher values will decrease accuracy, default value is 0.5
+You can try to improve performance by tweaking `time_between_checks`, Lower values will decrease performance, higher values will decrease accuracy, default value is 1.0
 
 set `full_vocab` to transcribe all known words before applying detection rules, by default this is false and the plugin will only look for the wake word samples, depending on wake word this may improve or decrease accuracy
-
-
 
 
 ### Multiple keywords
 
 A single model per language can be used to check for multiple keywords at once
+
+for example to replace the default wake words
+
+```json
+  "hotwords": {
+    "hey mycroft": {"active": false},
+    "wake up": {"active": false},
+    "hey xxx": {
+        "module": "ovos-ww-plugin-vosk-multi",
+        "listen": true,
+        "wakeup": true,
+        "keywords": {
+           "hey mycroft": {"samples": ["hey mycroft", "hey microsoft", "hey minecraft"], "rule": "fuzzy"},
+           "wake up": {"wakeup": true}
+        }
+    }
+```
+
+you can load any number of languages side by side
 
 ```json
   "hotwords": {
@@ -97,7 +114,6 @@ A single model per language can be used to check for multiple keywords at once
            "hey jarvis": {},
            "computador": {"lang": "pt"},
            "jarbas": {"lang": "pt"}
-        },
-        "time_between_checks": 0.8
+        }
     }
 ```

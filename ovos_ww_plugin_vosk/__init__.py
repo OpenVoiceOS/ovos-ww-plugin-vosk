@@ -13,7 +13,7 @@
 import enum
 import json
 from os.path import join, exists
-
+from ovos_utils.messagebus import get_mycroft_bus, Message
 from ovos_plugin_manager.templates.hotwords import HotWordEngine
 from ovos_skill_installer import download_extract_zip, download_extract_tar
 from ovos_utils.log import LOG
@@ -170,7 +170,7 @@ class VoskWakeWordPlugin(HotWordEngine):
         self.thresh = self.config.get("threshold", 0.75)
         self.debug = self.config.get("debug", False)
         self.time_between_checks = \
-            min(self.config.get("time_between_checks", 0.5), 3)
+            min(self.config.get("time_between_checks", 1.0), 3)
         self.expected_duration = self.MAX_EXPECTED_DURATION
         self._counter = 0
         self._load_model()
@@ -304,10 +304,12 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
         self.keywords = self.config.get("keywords", {})
         self.expected_duration = self.MAX_EXPECTED_DURATION
         self.full_vocab = self.config.get("full_vocab", False)
-        self.debug = self.config.get("debug", False) or True
-        self.time_between_checks = min(self.config.get("time_between_checks", 0.8), 3)
+        self.debug = self.config.get("debug", False)
+        self.time_between_checks = min(self.config.get("time_between_checks", 1.0), 3)
         self._counter = 0
         self._load_model()
+        # TODO refactor this, add native support to OPN
+        self.bus = get_mycroft_bus()
 
     @property
     def langs(self):
@@ -359,10 +361,14 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
             samples = kw.get("samples") or [kw_name.replace("_", " ").replace("-", " ")]
             rule = kw.get("rule") or MatchRule.EQUALS
             thresh = kw.get("threshold", 0.75)
+            wakeup = kw.get("wakeup", False)
             found = VoskWakeWordPlugin.apply_rules(transcript, samples, rule, thresh)
             if found:
                 LOG.info(f"Detected kw: {kw_name}")
                 if self.debug:
                     LOG.debug(str(kw))
+                if wakeup:
+                    self.bus.emit(Message('recognizer_loop:wake_up'))
+                    return False
                 return True
         return False
