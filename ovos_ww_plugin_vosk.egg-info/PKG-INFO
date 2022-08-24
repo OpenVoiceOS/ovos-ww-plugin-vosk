@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: ovos-ww-plugin-vosk
-Version: 0.0.3
+Version: 0.0.4
 Summary: Kaldi wake word plugin for mycroft
 Home-page: https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk
 Author: JarbasAi
