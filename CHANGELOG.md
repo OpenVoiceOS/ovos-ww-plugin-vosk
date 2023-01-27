@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/HEAD)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.1a1...HEAD)
+
+**Merged pull requests:**
+
+- Add .gitignore [\#5](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/5) ([NeonDaniel](https://github.com/NeonDaniel))
+
+## [V0.1.1a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.1.1a1) (2022-11-18)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.0...V0.1.1a1)
+
 ## [V0.1.0](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.1.0) (2022-08-25)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.0a1...V0.1.0)
