@@ -2,7 +2,16 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.1a1...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.1a2...HEAD)
+
+**Merged pull requests:**
+
+- Fix typo in build tests [\#7](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/7) ([NeonDaniel](https://github.com/NeonDaniel))
+- Update license tests [\#6](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/6) ([NeonDaniel](https://github.com/NeonDaniel))
+
+## [V0.1.1a2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.1.1a2) (2023-01-27)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.1a1...V0.1.1a2)
 
 **Merged pull requests:**
 
