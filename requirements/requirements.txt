@@ -2,3 +2,4 @@ numpy
 vosk
 ovos-plugin-manager~=0.0, >=0.0.1
 ovos-skill-installer~=0.0
+ovos-bus-client >=0.0.6

@@ -1,66 +1,20 @@
 # Changelog
 
-## [Unreleased](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/HEAD)
+## [0.1.2a2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.2a2) (2024-09-11)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.1a2...HEAD)
-
-**Merged pull requests:**
-
-- Fix typo in build tests [\#7](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/7) ([NeonDaniel](https://github.com/NeonDaniel))
-- Update license tests [\#6](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/6) ([NeonDaniel](https://github.com/NeonDaniel))
-
-## [V0.1.1a2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.1.1a2) (2023-01-27)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.1a1...V0.1.1a2)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.2a1...0.1.2a2)
 
 **Merged pull requests:**
 
-- Add .gitignore [\#5](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/5) ([NeonDaniel](https://github.com/NeonDaniel))
+- feat:semver [\#9](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/9) ([JarbasAl](https://github.com/JarbasAl))
 
-## [V0.1.1a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.1.1a1) (2022-11-18)
+## [V0.1.2a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.1.2a1) (2024-01-21)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.0...V0.1.1a1)
-
-## [V0.1.0](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.1.0) (2022-08-25)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.0a1...V0.1.0)
-
-## [V0.1.0a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.1.0a1) (2022-08-25)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.0.4...V0.1.0a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.1...V0.1.2a1)
 
 **Merged pull requests:**
 
-- Update dependencies [\#4](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/4) ([NeonDaniel](https://github.com/NeonDaniel))
-
-## [V0.0.4](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.0.4) (2022-08-24)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.0.3...V0.0.4)
-
-## [V0.0.3](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.0.3) (2022-07-13)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.0.3a1...V0.0.3)
-
-## [V0.0.3a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.0.3a1) (2022-07-13)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.0.2...V0.0.3a1)
-
-**Implemented enhancements:**
-
-- use vosk keyword list [\#1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/issues/1)
-- Feat/multiww wakeup [\#3](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/3) ([JarbasAl](https://github.com/JarbasAl))
-
-## [V0.0.2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.0.2) (2022-07-12)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.0.2a2...V0.0.2)
-
-## [V0.0.2a2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.0.2a2) (2022-07-12)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/ecde463b30d9f62ff33de38e7b832a8a1871100a...V0.0.2a2)
-
-**Implemented enhancements:**
-
-- feat/v0.0.2 [\#2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/2) ([JarbasAl](https://github.com/JarbasAl))
+- update for utils \>0.1.0 [\#8](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/8) ([builderjer](https://github.com/builderjer))
 
 
 

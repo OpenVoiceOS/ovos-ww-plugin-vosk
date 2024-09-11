@@ -13,7 +13,8 @@
 import enum
 import json
 from os.path import join, exists
-from ovos_utils.messagebus import get_mycroft_bus, Message
+from ovos_bus_client.message import Message
+from ovos_bus_client.util import get_mycroft_bus
 from ovos_plugin_manager.templates.hotwords import HotWordEngine
 from ovos_skill_installer import download_extract_zip, download_extract_tar
 from ovos_utils.log import LOG
