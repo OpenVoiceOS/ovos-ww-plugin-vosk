@@ -1,3 +1,3 @@
 numpy
 vosk
-ovos-plugin-manager>=0.0.1a7
+ovos-plugin-manager>=0.0.1,<1.0.0
