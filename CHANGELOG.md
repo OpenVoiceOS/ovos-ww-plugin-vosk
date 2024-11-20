@@ -1,20 +1,16 @@
 # Changelog
 
-## [0.1.2a2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.2a2) (2024-09-11)
+## [0.1.3a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.3a1) (2024-11-20)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.2a1...0.1.2a2)
-
-**Merged pull requests:**
-
-- feat:semver [\#9](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/9) ([JarbasAl](https://github.com/JarbasAl))
-
-## [V0.1.2a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.1.2a1) (2024-01-21)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.1...V0.1.2a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.2...0.1.3a1)
 
 **Merged pull requests:**
 
-- update for utils \>0.1.0 [\#8](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/8) ([builderjer](https://github.com/builderjer))
+- fix: drop deprecated dependency [\#13](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/13) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.1.2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.1.2) (2024-09-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.2...V0.1.2)
 
 
 
