@@ -1,16 +1,21 @@
 # Changelog
 
-## [0.1.3a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.3a1) (2024-11-20)
+## [0.1.4a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.4a1) (2024-11-25)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.2...0.1.3a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.3...0.1.4a1)
+
+**Closed issues:**
+
+- drop dependency on deprecated ovos\_skill\_installer [\#12](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/issues/12)
+- Download folder is being stripped at the wrong period. [\#11](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/issues/11)
 
 **Merged pull requests:**
 
-- fix: drop deprecated dependency [\#13](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/13) ([JarbasAl](https://github.com/JarbasAl))
+- fix: download path [\#15](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/15) ([JarbasAl](https://github.com/JarbasAl))
 
-## [V0.1.2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.1.2) (2024-09-11)
+## [V0.1.3](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.1.3) (2024-11-20)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.2...V0.1.2)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.3...V0.1.3)
 
 
 
