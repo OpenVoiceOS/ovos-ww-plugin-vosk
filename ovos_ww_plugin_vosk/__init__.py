@@ -108,7 +108,7 @@ class ModelContainer:
     @staticmethod
     def download_model(url):
         folder = join(xdg_data_home(), 'vosk')
-        name = url.split("/")[-1].split(".")[0]
+        name = url.split("/")[-1].replace(".zip", "").replace(".tar.xz", "")
         model_path = join(folder, name)
         if not exists(model_path):
             LOG.info(f"Downloading model for vosk {url}")
