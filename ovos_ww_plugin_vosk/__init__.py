@@ -24,6 +24,7 @@ import requests
 from ovos_bus_client.message import Message
 from ovos_bus_client.util import get_mycroft_bus
 from ovos_plugin_manager.templates.hotwords import HotWordEngine
+from ovos_plugin_manager.utils import ReadWriteStream
 from ovos_utils.log import LOG
 from ovos_utils.parse import fuzzy_match, MatchStrategy
 from ovos_utils.xdg_utils import xdg_data_home
@@ -168,9 +169,9 @@ class VoskWakeWordPlugin(HotWordEngine):
     SEC_BETWEEN_WW_CHECKS = 0.2
     MAX_EXPECTED_DURATION = 3  # seconds of data chunks received at a time
 
-    def __init__(self, hotword="hey mycroft", config=None, lang="en-us"):
+    def __init__(self, hotword="hey mycroft", config=None):
         config = config or {}
-        super(VoskWakeWordPlugin, self).__init__(hotword, config, lang)
+        super(VoskWakeWordPlugin, self).__init__(hotword, config)
         default_sample = [hotword.replace("_", " ").replace("-", " ")]
         self.full_vocab = self.config.get("full_vocab", False)
         self.samples = self.config.get("samples", default_sample)
@@ -182,6 +183,7 @@ class VoskWakeWordPlugin(HotWordEngine):
         self.expected_duration = self.MAX_EXPECTED_DURATION
         self._counter = 0
         self._load_model()
+        self.buffer = ReadWriteStream(max_size=96000)  # 3 second buffer
 
     def _load_model(self):
         # model_folder for backwards compat
@@ -194,7 +196,10 @@ class VoskWakeWordPlugin(HotWordEngine):
         else:
             self.model.load_language(self.lang)
 
-    def found_wake_word(self, frame_data):
+    def update(self, chunk: bytes):
+        self.buffer.write(chunk)
+
+    def found_wake_word(self) -> bool:
         """ frame data contains audio data that needs to be checked for a wake
         word, you can process audio here or just return a result
         previously handled in update method """
@@ -203,7 +208,7 @@ class VoskWakeWordPlugin(HotWordEngine):
             return False
         self._counter = 0
         try:
-            self.model.process_audio(frame_data, self.lang)
+            self.model.process_audio(self.buffer.read(), self.lang)
             transcript = self.model.get_final_transcription(self.lang)
         except:
             LOG.error("Failed to process audio")
@@ -212,7 +217,10 @@ class VoskWakeWordPlugin(HotWordEngine):
             return False
         if self.debug:
             LOG.debug("TRANSCRIPT: " + transcript)
-        return self.apply_rules(transcript, self.samples, self.rule, self.thresh)
+        found = self.apply_rules(transcript, self.samples, self.rule, self.thresh)
+        if found:
+            self.buffer.clear()
+        return found
 
     @classmethod
     def apply_rules(cls, transcript, samples, rule=MatchRule.FUZZY, thresh=0.75):
@@ -306,9 +314,9 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
     SEC_BETWEEN_WW_CHECKS = 0.2
     MAX_EXPECTED_DURATION = 3  # seconds of data chunks received at a time
 
-    def __init__(self, hotword="hey xxx", config=None, lang="en-us"):
+    def __init__(self, hotword="hey xxx", config=None):
         config = config or {}
-        super().__init__(hotword, config, lang)
+        super().__init__(hotword, config)
         self.keywords = self.config.get("keywords", {})
         self.expected_duration = self.MAX_EXPECTED_DURATION
         self.full_vocab = self.config.get("full_vocab", False)
@@ -318,6 +326,10 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
         self._load_model()
         # TODO refactor this, add native support to OPN
         self.bus = get_mycroft_bus()
+        self.buffer = ReadWriteStream(max_size=96000)  # 3 second buffer
+
+    def update(self, chunk: bytes):
+        self.buffer.write(chunk)
 
     @property
     def langs(self):
@@ -342,7 +354,7 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
         for lang in self.langs:
             self.model.load_language(lang)
 
-    def found_wake_word(self, frame_data):
+    def found_wake_word(self) -> bool:
         """ frame data contains audio data that needs to be checked for a wake
         word, you can process audio here or just return a result
         previously handled in update method """
@@ -357,7 +369,7 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
                 transcript = txs[lang]
             else:
                 try:
-                    self.model.process_audio(frame_data, lang)
+                    self.model.process_audio(self.buffer.read(), lang)
                     transcript = self.model.get_final_transcription(lang)
                 except:
                     LOG.error(f"Failed to process audio for lang: {lang}")
@@ -373,6 +385,7 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
             found = VoskWakeWordPlugin.apply_rules(transcript, samples, rule, thresh)
             if found:
                 LOG.info(f"Detected kw: {kw_name}")
+                self.buffer.clear()
                 if self.debug:
                     LOG.debug(str(kw))
                 if wakeup:
