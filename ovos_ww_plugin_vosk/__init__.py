@@ -21,6 +21,7 @@ from os.path import isdir, join, exists
 from tempfile import mkstemp
 
 import requests
+from ovos_config import Configuration
 from ovos_bus_client.message import Message
 from ovos_bus_client.util import get_mycroft_bus
 from ovos_plugin_manager.templates.hotwords import HotWordEngine
@@ -178,6 +179,7 @@ class VoskWakeWordPlugin(HotWordEngine):
         self.rule = self.config.get("rule", MatchRule.EQUALS)
         self.thresh = self.config.get("threshold", 0.75)
         self.debug = self.config.get("debug", False)
+        self.lang = self.config.get("lang", Configuration().get("lang"))
         self.time_between_checks = \
             min(self.config.get("time_between_checks", 1.0), 3)
         self.expected_duration = self.MAX_EXPECTED_DURATION
