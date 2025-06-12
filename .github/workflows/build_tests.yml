@@ -7,13 +7,13 @@ jobs:
   build_tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
       - name: Setup Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: "3.11"
       - name: Install Build Tools
         run: |
           python -m pip install build wheel
@@ -26,11 +26,7 @@ jobs:
           python setup.py sdist
       - name: Build Distribution Packages
         run: |
-          python setup.py bdist_wheel
-      - name: Install tflite_runtime workaround tflit bug
+          python setup.py sdist bdist_wheel
+      - name: Install repo
         run: |
-          pip3 install numpy
-          pip3 install --extra-index-url https://google-coral.github.io/py-repo/ tflite_runtime
-      - name: Install core repo
-        run: |
-          pip install .[audio-backend,mark1,stt,tts,skills_minimal,skills,gui,bus,all]
+          pip install .
