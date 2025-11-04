@@ -56,7 +56,7 @@ PLUGIN_ENTRY_POINT = (
 )
 
 setup(
-    name='ovos-ww-plugin-vosk',
+    name='ovos_ww_plugin_vosk',
     version=get_version(),
     description='Kaldi wake word plugin for mycroft',
     url='https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk',
