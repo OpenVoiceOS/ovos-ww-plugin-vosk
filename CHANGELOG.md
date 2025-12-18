@@ -1,16 +1,16 @@
 # Changelog
 
-## [0.1.8a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.8a1) (2025-11-04)
+## [0.1.9a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.9a1) (2025-12-18)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.7...0.1.8a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.8...0.1.9a1)
 
 **Merged pull requests:**
 
-- Update ovos-plugin-manager version constraint [\#22](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/22) ([JarbasAl](https://github.com/JarbasAl))
+- chore: Configure Renovate [\#24](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/24) ([renovate[bot]](https://github.com/apps/renovate))
 
-## [V0.1.7](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.1.7) (2025-06-12)
+## [V0.1.8](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.1.8) (2025-11-04)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.7...V0.1.7)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.8...V0.1.8)
 
 
 
