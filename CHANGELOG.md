@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.9a2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.9a2) (2025-12-19)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.9a1...0.1.9a2)
+
+**Merged pull requests:**
+
+- chore\(deps\): update dependency python to 3.14 [\#26](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/26) ([renovate[bot]](https://github.com/apps/renovate))
+
 ## [0.1.9a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.9a1) (2025-12-18)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.8...0.1.9a1)
