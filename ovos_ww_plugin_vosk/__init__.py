@@ -230,7 +230,6 @@ class VoskWakeWordPlugin(HotWordEngine):
         best = 0.0
         for s in samples:
             s = s.lower().strip()
-            score = 0.0
             if rule == MatchRule.FUZZY:
                 score = fuzzy_match(s, transcript)
             elif rule == MatchRule.TOKEN_SORT_RATIO:
@@ -238,31 +237,19 @@ class VoskWakeWordPlugin(HotWordEngine):
             elif rule == MatchRule.TOKEN_SET_RATIO:
                 score = fuzzy_match(s, transcript,  strategy=MatchStrategy.TOKEN_SET_RATIO)
             elif rule == MatchRule.PARTIAL_TOKEN_SORT_RATIO:
-                score = fuzzy_match(s, transcript,
-                                    strategy=MatchStrategy.PARTIAL_TOKEN_SORT_RATIO)
+                score = fuzzy_match(s, transcript, strategy=MatchStrategy.PARTIAL_TOKEN_SORT_RATIO)
             elif rule == MatchRule.PARTIAL_TOKEN_SET_RATIO:
-                score = fuzzy_match(s, transcript,
-                                    strategy=MatchStrategy.PARTIAL_TOKEN_SET_RATIO)
+                score = fuzzy_match(s, transcript, strategy=MatchStrategy.PARTIAL_TOKEN_SET_RATIO)
             elif rule == MatchRule.CONTAINS:
-                if s in transcript:
-                    score = 1.0
-                else:
-                    score = 0.0
+                score = 1.0 if s in transcript else 0.0
             elif rule == MatchRule.EQUALS:
-                if s == transcript:
-                    score = 1.0
-                else:
-                    score = 0.0
+                score = 1.0 if s == transcript else 0.0
             elif rule == MatchRule.STARTS:
-                if transcript.startswith(s):
-                    score = 1.0
-                else:
-                    score = 0.0
+                score = 1.0 if transcript.startswith(s) else 0.0
             elif rule == MatchRule.ENDS:
-                if transcript.endswith(s):
-                    score = 1.0
-                else:
-                    score = 0.0
+                score = 1.0 if transcript.endswith(s) else 0.0
+            else:
+                score = 0.0
             best = max(best, score)
 
         return best
