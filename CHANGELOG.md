@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.9a4](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.9a4) (2026-01-09)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.9a3...0.1.9a4)
+
+**Merged pull requests:**
+
+- chore\(deps\): update actions/checkout action to v6 [\#30](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/30) ([renovate[bot]](https://github.com/apps/renovate))
+
 ## [0.1.9a3](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.9a3) (2026-01-09)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.9a2...0.1.9a3)
