@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.9a7](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.9a7) (2026-01-09)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.9a5...0.1.9a7)
+
 ## [0.1.9a5](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.9a5) (2026-01-09)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.9a4...0.1.9a5)
