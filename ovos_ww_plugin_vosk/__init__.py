@@ -25,11 +25,11 @@ from ovos_config import Configuration
 from ovos_bus_client.message import Message
 from ovos_bus_client.util import get_mycroft_bus
 from ovos_plugin_manager.templates.hotwords import HotWordEngine
+from ovos_plugin_manager.utils.audio import AudioData
 from ovos_plugin_manager.utils import ReadWriteStream
 from ovos_utils.log import LOG
 from ovos_utils.parse import fuzzy_match, MatchStrategy
 from ovos_utils.xdg_utils import xdg_data_home
-from speech_recognition import AudioData
 from vosk import Model as KaldiModel, KaldiRecognizer
 
 
@@ -219,52 +219,40 @@ class VoskWakeWordPlugin(HotWordEngine):
             return False
         if self.debug:
             LOG.debug("TRANSCRIPT: " + transcript)
-        found = self.apply_rules(transcript, self.samples, self.rule, self.thresh)
+        score = self.score(transcript, self.samples, self.rule)
+        found = score >= self.thresh
         if found:
             self.buffer.clear()
         return found
 
     @classmethod
-    def apply_rules(cls, transcript, samples, rule=MatchRule.FUZZY, thresh=0.75):
+    def score(cls, transcript, samples, rule=MatchRule.FUZZY) -> float:
+        best = 0.0
         for s in samples:
             s = s.lower().strip()
             if rule == MatchRule.FUZZY:
                 score = fuzzy_match(s, transcript)
-                if score >= thresh:
-                    return True
             elif rule == MatchRule.TOKEN_SORT_RATIO:
-                score = fuzzy_match(s, transcript,
-                                    strategy=MatchStrategy.TOKEN_SORT_RATIO)
-                if score >= thresh:
-                    return True
+                score = fuzzy_match(s, transcript, strategy=MatchStrategy.TOKEN_SORT_RATIO)
             elif rule == MatchRule.TOKEN_SET_RATIO:
-                score = fuzzy_match(s, transcript,
-                                    strategy=MatchStrategy.TOKEN_SET_RATIO)
-                if score >= thresh:
-                    return True
+                score = fuzzy_match(s, transcript,  strategy=MatchStrategy.TOKEN_SET_RATIO)
             elif rule == MatchRule.PARTIAL_TOKEN_SORT_RATIO:
-                score = fuzzy_match(s, transcript,
-                                    strategy=MatchStrategy.PARTIAL_TOKEN_SORT_RATIO)
-                if score >= thresh:
-                    return True
+                score = fuzzy_match(s, transcript, strategy=MatchStrategy.PARTIAL_TOKEN_SORT_RATIO)
             elif rule == MatchRule.PARTIAL_TOKEN_SET_RATIO:
-                score = fuzzy_match(s, transcript,
-                                    strategy=MatchStrategy.PARTIAL_TOKEN_SET_RATIO)
-                if score >= thresh:
-                    return True
+                score = fuzzy_match(s, transcript, strategy=MatchStrategy.PARTIAL_TOKEN_SET_RATIO)
             elif rule == MatchRule.CONTAINS:
-                if s in transcript:
-                    return True
+                score = 1.0 if s in transcript else 0.0
             elif rule == MatchRule.EQUALS:
-                if s == transcript:
-                    return True
+                score = 1.0 if s == transcript else 0.0
             elif rule == MatchRule.STARTS:
-                if transcript.startswith(s):
-                    return True
+                score = 1.0 if transcript.startswith(s) else 0.0
             elif rule == MatchRule.ENDS:
-                if transcript.endswith(s):
-                    return True
-        return False
+                score = 1.0 if transcript.endswith(s) else 0.0
+            else:
+                score = 0.0
+            best = max(best, score)
+
+        return best
 
 
 class MultiLangModelContainer(ModelContainer):
@@ -384,7 +372,8 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
             rule = kw.get("rule") or MatchRule.EQUALS
             thresh = kw.get("threshold", 0.75)
             wakeup = kw.get("wakeup", False)
-            found = VoskWakeWordPlugin.apply_rules(transcript, samples, rule, thresh)
+            score = VoskWakeWordPlugin.score(transcript, samples, rule, thresh)
+            found = score >= thresh
             if found:
                 LOG.info(f"Detected kw: {kw_name}")
                 self.buffer.clear()
