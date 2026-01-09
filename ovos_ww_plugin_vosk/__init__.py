@@ -25,11 +25,11 @@ from ovos_config import Configuration
 from ovos_bus_client.message import Message
 from ovos_bus_client.util import get_mycroft_bus
 from ovos_plugin_manager.templates.hotwords import HotWordEngine
+from ovos_plugin_manager.utils.audio import AudioData
 from ovos_plugin_manager.utils import ReadWriteStream
 from ovos_utils.log import LOG
 from ovos_utils.parse import fuzzy_match, MatchStrategy
 from ovos_utils.xdg_utils import xdg_data_home
-from speech_recognition import AudioData
 from vosk import Model as KaldiModel, KaldiRecognizer
 
 
@@ -219,52 +219,45 @@ class VoskWakeWordPlugin(HotWordEngine):
             return False
         if self.debug:
             LOG.debug("TRANSCRIPT: " + transcript)
-        found = self.apply_rules(transcript, self.samples, self.rule, self.thresh)
+        score = self.score(transcript, self.samples, self.rule)
+        found = score >= self.thresh
         if found:
             self.buffer.clear()
         return found
 
     @classmethod
-    def apply_rules(cls, transcript, samples, rule=MatchRule.FUZZY, thresh=0.75):
+    def score(cls, transcript, samples, rule=MatchRule.FUZZY) -> float:
         for s in samples:
             s = s.lower().strip()
             if rule == MatchRule.FUZZY:
-                score = fuzzy_match(s, transcript)
-                if score >= thresh:
-                    return True
+                return fuzzy_match(s, transcript)
             elif rule == MatchRule.TOKEN_SORT_RATIO:
-                score = fuzzy_match(s, transcript,
-                                    strategy=MatchStrategy.TOKEN_SORT_RATIO)
-                if score >= thresh:
-                    return True
+                return fuzzy_match(s, transcript, strategy=MatchStrategy.TOKEN_SORT_RATIO)
             elif rule == MatchRule.TOKEN_SET_RATIO:
-                score = fuzzy_match(s, transcript,
-                                    strategy=MatchStrategy.TOKEN_SET_RATIO)
-                if score >= thresh:
-                    return True
+                return fuzzy_match(s, transcript,  strategy=MatchStrategy.TOKEN_SET_RATIO)
             elif rule == MatchRule.PARTIAL_TOKEN_SORT_RATIO:
-                score = fuzzy_match(s, transcript,
+                return fuzzy_match(s, transcript,
                                     strategy=MatchStrategy.PARTIAL_TOKEN_SORT_RATIO)
-                if score >= thresh:
-                    return True
             elif rule == MatchRule.PARTIAL_TOKEN_SET_RATIO:
-                score = fuzzy_match(s, transcript,
+                return fuzzy_match(s, transcript,
                                     strategy=MatchStrategy.PARTIAL_TOKEN_SET_RATIO)
-                if score >= thresh:
-                    return True
             elif rule == MatchRule.CONTAINS:
                 if s in transcript:
-                    return True
+                    return 1.0
+                return 0.0
             elif rule == MatchRule.EQUALS:
                 if s == transcript:
-                    return True
+                    return 1.0
+                return 0.0
             elif rule == MatchRule.STARTS:
                 if transcript.startswith(s):
-                    return True
+                    return 1.0
+                return 0.0
             elif rule == MatchRule.ENDS:
                 if transcript.endswith(s):
-                    return True
-        return False
+                    return 1.0
+                return 0.0
+        return 0.0
 
 
 class MultiLangModelContainer(ModelContainer):
