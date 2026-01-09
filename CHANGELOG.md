@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.10a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.10a1) (2026-01-09)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.9a7...0.1.10a1)
+
+**Merged pull requests:**
+
+- fix: update entrypoint [\#36](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/36) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.1.9a7](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.9a7) (2026-01-09)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.9a5...0.1.9a7)
