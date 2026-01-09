@@ -372,7 +372,8 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
             rule = kw.get("rule") or MatchRule.EQUALS
             thresh = kw.get("threshold", 0.75)
             wakeup = kw.get("wakeup", False)
-            found = VoskWakeWordPlugin.apply_rules(transcript, samples, rule, thresh)
+            score = VoskWakeWordPlugin.score(transcript, samples, rule, thresh)
+            found = score >= thresh
             if found:
                 LOG.info(f"Detected kw: {kw_name}")
                 self.buffer.clear()
