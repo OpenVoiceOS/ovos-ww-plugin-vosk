@@ -227,37 +227,45 @@ class VoskWakeWordPlugin(HotWordEngine):
 
     @classmethod
     def score(cls, transcript, samples, rule=MatchRule.FUZZY) -> float:
+        best = 0.0
         for s in samples:
             s = s.lower().strip()
+            score = 0.0
             if rule == MatchRule.FUZZY:
-                return fuzzy_match(s, transcript)
+                score = fuzzy_match(s, transcript)
             elif rule == MatchRule.TOKEN_SORT_RATIO:
-                return fuzzy_match(s, transcript, strategy=MatchStrategy.TOKEN_SORT_RATIO)
+                score = fuzzy_match(s, transcript, strategy=MatchStrategy.TOKEN_SORT_RATIO)
             elif rule == MatchRule.TOKEN_SET_RATIO:
-                return fuzzy_match(s, transcript,  strategy=MatchStrategy.TOKEN_SET_RATIO)
+                score = fuzzy_match(s, transcript,  strategy=MatchStrategy.TOKEN_SET_RATIO)
             elif rule == MatchRule.PARTIAL_TOKEN_SORT_RATIO:
-                return fuzzy_match(s, transcript,
+                score = fuzzy_match(s, transcript,
                                     strategy=MatchStrategy.PARTIAL_TOKEN_SORT_RATIO)
             elif rule == MatchRule.PARTIAL_TOKEN_SET_RATIO:
-                return fuzzy_match(s, transcript,
+                score = fuzzy_match(s, transcript,
                                     strategy=MatchStrategy.PARTIAL_TOKEN_SET_RATIO)
             elif rule == MatchRule.CONTAINS:
                 if s in transcript:
-                    return 1.0
-                return 0.0
+                    score = 1.0
+                else:
+                    score = 0.0
             elif rule == MatchRule.EQUALS:
                 if s == transcript:
-                    return 1.0
-                return 0.0
+                    score = 1.0
+                else:
+                    score = 0.0
             elif rule == MatchRule.STARTS:
                 if transcript.startswith(s):
-                    return 1.0
-                return 0.0
+                    score = 1.0
+                else:
+                    score = 0.0
             elif rule == MatchRule.ENDS:
                 if transcript.endswith(s):
-                    return 1.0
-                return 0.0
-        return 0.0
+                    score = 1.0
+                else:
+                    score = 0.0
+            best = max(best, score)
+
+        return best
 
 
 class MultiLangModelContainer(ModelContainer):
