@@ -72,5 +72,12 @@ setup(
         'License :: OSI Approved :: Apache Software License',
     ],
     keywords='mycroft ovos plugin wake word',
-    entry_points={'opm.wake_word': PLUGIN_ENTRY_POINT}
+    entry_points={'opm.wake_word': PLUGIN_ENTRY_POINT},
+    extras_require={
+        "test": [
+            "ovoscope",
+            "vosk",
+            "pytest",
+        ]
+    }
 )

@@ -1,0 +1,27 @@
+name: Run Unit Tests
+on:
+  push:
+  pull_request:
+    branches:
+      - dev
+  workflow_dispatch:
+
+jobs:
+  unit_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg
+      - name: Install package with test extras
+        run: |
+          pip install -e ".[test]"
+      - name: Run e2e tests
+        run: |
+          pytest test/test_e2e_listener.py -v
