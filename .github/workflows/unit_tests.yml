@@ -1,27 +1,15 @@
-name: Run Unit Tests
+name: Build Tests (e2e)
+
 on:
-  push:
   pull_request:
-    branches:
-      - dev
+    branches: [dev, master]
   workflow_dispatch:
 
 jobs:
-  unit_tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - name: Setup Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.11"
-      - name: Install System Dependencies
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y -q ffmpeg
-      - name: Install package with test extras
-        run: |
-          pip install -e ".[test]"
-      - name: Run e2e tests
-        run: |
-          pytest test/test_e2e_listener.py -v
+  build:
+    uses: OpenVoiceOS/gh-automations/.github/workflows/build-tests.yml@dev
+    secrets: inherit
+    with:
+      python_versions: '["3.10", "3.11", "3.12"]'
+      install_extras: 'test'
+      test_path: 'test'
