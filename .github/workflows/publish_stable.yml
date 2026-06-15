@@ -2,15 +2,22 @@ name: Publish Stable Release
 
 on:
   workflow_dispatch:
-  pull_request:
-    types: [closed]
-    branches: [master]
+  push:
+    branches: [master, main]
+
+permissions:
+  contents: write
 
 jobs:
   publish_stable:
-    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+    if: github.actor != 'github-actions[bot]'
     uses: OpenVoiceOS/gh-automations/.github/workflows/publish-stable.yml@dev
-    secrets: inherit
+    secrets:
+      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+      MATRIX_TOKEN: ${{ secrets.MATRIX_TOKEN }}
     with:
       version_file: 'ovos_ww_plugin_vosk/version.py'
       publish_pypi: true
+      publish_release: true
+      sync_dev: true
+      notify_matrix: true
