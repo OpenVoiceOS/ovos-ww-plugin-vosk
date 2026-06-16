@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.11a2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.11a2) (2026-06-16)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.11a1...0.1.11a2)
+
+**Merged pull requests:**
+
+- chore: add missing shared CI workflows [\#43](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/43) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.1.11a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.11a1) (2026-06-14)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.10...0.1.11a1)
