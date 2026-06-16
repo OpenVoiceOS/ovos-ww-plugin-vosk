@@ -43,3 +43,4 @@ version = {attr = "ovos_ww_plugin_vosk.version.__version__"}
 
 [tool.setuptools.packages.find]
 where = ["."]
+include = ["ovos_ww_plugin_vosk*"]
