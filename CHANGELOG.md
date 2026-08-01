@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.11a3](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.11a3) (2026-08-01)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.11a2...0.1.11a3)
+
+**Merged pull requests:**
+
+- docs: rewrite README in Simplified Technical English [\#45](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/45) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.1.11a2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.11a2) (2026-06-16)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.11a1...0.1.11a2)
