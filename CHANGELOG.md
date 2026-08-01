@@ -1,60 +1,32 @@
 # Changelog
 
-## [0.1.10a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.10a1) (2026-01-09)
+## [0.1.11a3](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.11a3) (2026-08-01)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.9a7...0.1.10a1)
-
-**Merged pull requests:**
-
-- fix: update entrypoint [\#36](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/36) ([JarbasAl](https://github.com/JarbasAl))
-
-## [0.1.9a7](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.9a7) (2026-01-09)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.9a5...0.1.9a7)
-
-## [0.1.9a5](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.9a5) (2026-01-09)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.9a4...0.1.9a5)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.11a2...0.1.11a3)
 
 **Merged pull requests:**
 
-- chore\(deps\): update actions/setup-python action to v6 [\#31](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/31) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: rewrite README in Simplified Technical English [\#45](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/45) ([JarbasAl](https://github.com/JarbasAl))
 
-## [0.1.9a4](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.9a4) (2026-01-09)
+## [0.1.11a2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.11a2) (2026-06-16)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.9a3...0.1.9a4)
-
-**Merged pull requests:**
-
-- chore\(deps\): update actions/checkout action to v6 [\#30](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/30) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [0.1.9a3](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.9a3) (2026-01-09)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.9a2...0.1.9a3)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.11a1...0.1.11a2)
 
 **Merged pull requests:**
 
-- refactor: drop dependency on speech\_recognition, rework scoring [\#33](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/33) ([JarbasAl](https://github.com/JarbasAl))
+- chore: add missing shared CI workflows [\#43](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/43) ([JarbasAl](https://github.com/JarbasAl))
 
-## [0.1.9a2](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.9a2) (2025-12-19)
+## [0.1.11a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.11a1) (2026-06-14)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.9a1...0.1.9a2)
-
-**Merged pull requests:**
-
-- chore\(deps\): update dependency python to 3.14 [\#26](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/26) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [0.1.9a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.9a1) (2025-12-18)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.8...0.1.9a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/V0.1.10...0.1.11a1)
 
 **Merged pull requests:**
 
-- chore: Configure Renovate [\#24](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/24) ([renovate[bot]](https://github.com/apps/renovate))
+- test: ovoscope listener e2e \(real vosk wakeword detection\) [\#41](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/41) ([JarbasAl](https://github.com/JarbasAl))
 
-## [V0.1.8](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.1.8) (2025-11-04)
+## [V0.1.10](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/V0.1.10) (2026-01-09)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.8...V0.1.8)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.10...V0.1.10)
 
 
 

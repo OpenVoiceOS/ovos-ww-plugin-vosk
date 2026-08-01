@@ -1,5 +1,8 @@
 ## Description
-Mycroft wake word plugin for [Vosk](https://alphacephei.com/vosk/)
+
+Vosk wake word plugin for [OpenVoiceOS](https://github.com/OpenVoiceOS). It uses the
+[Vosk](https://alphacephei.com/vosk/) speech recognizer to transcribe short audio
+chunks and check the transcript against one or more wake word samples.
 
 ## Install
 
@@ -9,7 +12,7 @@ Mycroft wake word plugin for [Vosk](https://alphacephei.com/vosk/)
 
 ### Quick start
 
-Add the following to your hotwords section in mycroft.conf 
+Add the following to the `hotwords` section in `mycroft.conf`.
 
 ```json
   "listener": {
@@ -22,23 +25,24 @@ Add the following to your hotwords section in mycroft.conf
     }
   }
 ```
-replace `hey_computer` with your wake word and thats all!
 
-a model wil be automatically downloaded for configured language
+Replace `hey_computer` with your wake word. A model downloads automatically for the
+configured language.
 
-### Single Keyword
+### Single keyword
 
-Some wake words are hard to trigger, usually if missing from the language model, 
-eg, `hey mycroft` is usually transcribed as `hey microsoft`, 
-by default this plugin will check for the wake word name, but the keyword can be configured in a number of ways
+Some wake words are hard to trigger, usually because the language model does not
+include them. For example, `hey mycroft` is often transcribed as `hey microsoft`. By
+default, this plugin checks for the wake word name, but you can configure the keyword
+in a number of ways.
 
-- `model_folder`- full path to a vosk model, optional, will be automatically downloaded
-- `lang` - lang code for model, optional, will use global value if not set. only used to download models
-- `debug` - if true will print extra info, like the transcription contents
-- `rule` - how to process the transcript for detections, see examples below
-- `time_between_checks` - the length in seconds between inferences, must be between 0.2 and 3
-- `full_vocab` - use the full model vocabulary for transcriptions, if false (default) vosk will run in keyword mode
-- `samples` - list of samples to match the rules against, optional, by default uses keyword name
+- `model_folder` - full path to a Vosk model. Optional; the plugin downloads one automatically.
+- `lang` - language code for the model. Optional; uses the global value if not set. Only affects which model downloads.
+- `debug` - if true, prints extra info, like the transcript contents.
+- `rule` - how to compare the transcript against the samples. See the rules below.
+- `time_between_checks` - the length in seconds between inferences. Must be between 0.2 and 3.
+- `full_vocab` - use the full model vocabulary for transcription. If false (default), Vosk runs in keyword mode.
+- `samples` - list of samples to match the rules against. Optional; defaults to the keyword name.
 
 ```json
   "listener": {
@@ -58,31 +62,33 @@ by default this plugin will check for the wake word name, but the keyword can be
   }
 ```
 
-#### Keyword Rules
+#### Keyword rules
 
-You can define different rules to trigger a wake word
+You can define different rules to trigger a wake word.
 
-- `contains` - if the transcript contains any of provided samples 
-- `equals` - if the transcript exactly matches any of provided samples 
-- `starts` - if the transcript starts with any of provided samples 
-- `ends` - if the transcript ends with any of provided samples 
-- `fuzzy` - fuzzy match transcript against samples
+- `contains` - the transcript contains any of the samples.
+- `equals` - the transcript exactly matches any of the samples.
+- `starts` - the transcript starts with any of the samples.
+- `ends` - the transcript ends with any of the samples.
+- `fuzzy` - fuzzy match the transcript against the samples.
 
+Enable the `debug` flag and check the logs to see what the plugin transcribes. Use
+this to tune the rule and samples.
 
-TIP: enable `debug` flag and check logs for what is being transcribed, then finetune the rule and samples
+Each wake word must fit in 3 seconds, the length of audio the model parses at a time.
 
-Each wake word must fit in 3 seconds, which is the length of audio the model parses at a time
+`time_between_checks` controls how often the plugin checks the buffered audio.
+Lower values run more checks and use more CPU. Higher values check less often and may
+miss short wake words. The default is 1.0.
 
-You can try to improve performance by tweaking `time_between_checks`, Lower values will decrease performance, higher values will decrease accuracy, default value is 1.0
-
-set `full_vocab` to transcribe all known words before applying detection rules, by default this is false and the plugin will only look for the wake word samples, depending on wake word this may improve or decrease accuracy
-
+Set `full_vocab` to transcribe all known words before applying the detection rules. By
+default this is false, and the plugin only looks for the wake word samples. Depending
+on the wake word, this may raise or lower accuracy.
 
 ### Multiple keywords
 
-A single model per language can be used to check for multiple keywords at once
-
-for example to replace the default wake words
+A single model per language can check for multiple keywords at once. For example, to
+replace the default wake words:
 
 ```json
   "hotwords": {
@@ -99,7 +105,7 @@ for example to replace the default wake words
     }
 ```
 
-you can load any number of languages side by side
+You can load any number of languages side by side.
 
 ```json
   "hotwords": {
@@ -117,3 +123,12 @@ you can load any number of languages side by side
         }
     }
 ```
+
+## Related projects
+
+- [OpenVoiceOS/ovos-plugin-manager](https://github.com/OpenVoiceOS/ovos-plugin-manager) - loads and manages OVOS plugins, including wake word engines like this one.
+- [OpenVoiceOS/ovos-dinkum-listener](https://github.com/OpenVoiceOS/ovos-dinkum-listener) - the OVOS listener service that runs wake word plugins against microphone audio.
+
+## License
+
+Apache-2.0
