@@ -15,6 +15,8 @@ import json
 import os
 import shutil
 import tarfile
+import threading
+import weakref
 import zipfile
 from os import makedirs
 from os.path import isdir, join, exists
@@ -43,6 +45,25 @@ class MatchRule(str, enum.Enum):
     TOKEN_SORT_RATIO = "token_sort_ratio"
     PARTIAL_TOKEN_SET_RATIO = "partial_token_set_ratio"
     PARTIAL_TOKEN_SORT_RATIO = "partial_token_sort_ratio"
+
+
+_MODELS = weakref.WeakValueDictionary()
+_MODELS_LOCK = threading.Lock()
+_DOWNLOAD_LOCKS = {}
+_DOWNLOAD_LOCKS_LOCK = threading.Lock()
+
+
+def _shared_model(model_path):
+    """One KaldiModel per resolved path, freed with its last recognizer.
+    A model is read-only and may back several recognizers
+    (vosk_api.h: "Model can be shared across recognizers, even running in
+    different threads")."""
+    key = os.path.realpath(model_path)
+    with _MODELS_LOCK:
+        model = _MODELS.get(key)
+        if model is None:
+            model = _MODELS[key] = KaldiModel(model_path)
+        return model
 
 
 class ModelContainer:
@@ -82,12 +103,16 @@ class ModelContainer:
 
     def get_model(self, model_path, samples=None):
         if model_path:
+            kaldi_model = _shared_model(model_path)
             if self.full_vocab:
-                model = KaldiRecognizer(KaldiModel(model_path), 16000)
+                recognizer = KaldiRecognizer(kaldi_model, 16000)
             else:
-                model = KaldiRecognizer(KaldiModel(model_path), 16000,
-                                        json.dumps(samples or self.samples))
-            return model
+                recognizer = KaldiRecognizer(kaldi_model, 16000,
+                                             json.dumps(samples or self.samples))
+            # the recognizer owns the python handle, so the registry entry
+            # lives exactly as long as some recognizer uses the model
+            recognizer.kaldi_model = kaldi_model
+            return recognizer
         else:
             raise FileNotFoundError
 
@@ -112,14 +137,17 @@ class ModelContainer:
         folder = join(xdg_data_home(), 'vosk')
         name = url.split("/")[-1].replace(".zip", "").replace(".tar.xz", "")
         model_path = join(folder, name)
-        if not exists(model_path):
-            LOG.info(f"Downloading model for vosk {url}")
-            LOG.info("this might take a while")
-            if url.endswith(".zip"):
-                download_extract_zip(url, folder=folder, skill_folder_name=name)
-            else:
-                download_extract_tar(url, folder=folder, skill_folder_name=name)
-            LOG.info(f"Model downloaded to {model_path}")
+        with _DOWNLOAD_LOCKS_LOCK:
+            lock = _DOWNLOAD_LOCKS.setdefault(url, threading.Lock())
+        with lock:
+            if not exists(model_path):
+                LOG.info(f"Downloading model for vosk {url}")
+                LOG.info("this might take a while")
+                if url.endswith(".zip"):
+                    download_extract_zip(url, folder=folder, skill_folder_name=name)
+                else:
+                    download_extract_tar(url, folder=folder, skill_folder_name=name)
+                LOG.info(f"Model downloaded to {model_path}")
 
         return model_path
 
