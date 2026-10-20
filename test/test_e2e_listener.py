@@ -55,8 +55,8 @@ def _drive(engine: VoskWakeWordPlugin, chunks, max_calls: int = 30) -> bool:
     for chunk in chunks:
         engine.update(chunk)
 
-    # Then poll — each call advances _counter by SEC_BETWEEN_WW_CHECKS (0.2)
-    # Audio is processed when _counter >= time_between_checks (1.0), i.e. 5 calls
+    # Then poll: the audio fed above passes time_between_checks, so the
+    # first call processes it
     for _ in range(max_calls):
         if engine.found_wake_word():
             detected = True

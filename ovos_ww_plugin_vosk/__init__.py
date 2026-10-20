@@ -26,7 +26,7 @@ from ovos_bus_client.message import Message
 from ovos_bus_client.util import get_mycroft_bus
 from ovos_plugin_manager.templates.hotwords import HotWordEngine
 from ovos_plugin_manager.utils.audio import AudioData
-from ovos_plugin_manager.utils import ReadWriteStream
+from ovos_spec_tools.language import closest_lang
 from ovos_utils.log import LOG
 from ovos_utils.parse import fuzzy_match, MatchStrategy
 from ovos_utils.xdg_utils import xdg_data_home
@@ -165,10 +165,11 @@ class ModelContainer:
         return lang2url.get(lang)
 
 
+BUFFER_BYTES = 96000  # 3 s of 16 kHz, 16-bit mono
+
+
 class VoskWakeWordPlugin(HotWordEngine):
     """Vosk Wake Word"""
-    # Hard coded values in mycroft/client/speech/mic.py
-    SEC_BETWEEN_WW_CHECKS = 0.2
     MAX_EXPECTED_DURATION = 3  # seconds of data chunks received at a time
 
     def __init__(self, hotword="hey mycroft", config=None):
@@ -186,7 +187,7 @@ class VoskWakeWordPlugin(HotWordEngine):
         self.expected_duration = self.MAX_EXPECTED_DURATION
         self._counter = 0
         self._load_model()
-        self.buffer = ReadWriteStream(max_size=96000)  # 3 second buffer
+        self.buffer = bytearray()
 
     def _load_model(self):
         # model_folder for backwards compat
@@ -200,18 +201,22 @@ class VoskWakeWordPlugin(HotWordEngine):
             self.model.load_language(self.lang)
 
     def update(self, chunk: bytes):
-        self.buffer.write(chunk)
+        # Each check transcribes the last 3 s, so a wake word that crosses a
+        # check boundary is still whole in the next window.
+        self.buffer += chunk
+        del self.buffer[:-BUFFER_BYTES]
+        # 16 kHz, 16-bit mono: the check interval counts audio time, not calls
+        self._counter += len(chunk) / 32000
 
     def found_wake_word(self) -> bool:
         """ frame data contains audio data that needs to be checked for a wake
         word, you can process audio here or just return a result
         previously handled in update method """
-        self._counter += self.SEC_BETWEEN_WW_CHECKS
         if self._counter < self.time_between_checks:
             return False
         self._counter = 0
         try:
-            self.model.process_audio(self.buffer.read(), self.lang)
+            self.model.process_audio(bytes(self.buffer), self.lang)
             transcript = self.model.get_final_transcription(self.lang)
         except:
             LOG.error("Failed to process audio")
@@ -257,8 +262,6 @@ class VoskWakeWordPlugin(HotWordEngine):
 
 
 class MultiLangModelContainer(ModelContainer):
-    engines = {}
-    models = {}
     lang_samples = {}
 
     def __init__(self, lang_samples=None, full_vocab=False, default_lang="en"):
@@ -266,8 +269,15 @@ class MultiLangModelContainer(ModelContainer):
             full_vocab = True
         lang = default_lang.split("-")[0].lower()
         self.lang_samples = lang_samples or {lang: [self.UNK]}
-        samples = lang_samples[lang]
+        # every keyword grammar needs [unk]; without it Kaldi maps any speech to the keyword
+        for keywords in self.lang_samples.values():
+            if self.UNK not in keywords:
+                keywords.append(self.UNK)
+        match = closest_lang(default_lang, list(self.lang_samples))
+        samples = self.lang_samples[match or next(iter(self.lang_samples))]
         self.default_lang = default_lang
+        self.engines = {}
+        self.models = {}
         super().__init__(samples, full_vocab)
 
     def get_engine(self, lang=None):
@@ -301,8 +311,6 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
      keeps multiple models in memory and runs detections for multiple wake words
      this avoids loading more than 1 model per language
      """
-    # Hard coded values in mycroft/client/speech/mic.py
-    SEC_BETWEEN_WW_CHECKS = 0.2
     MAX_EXPECTED_DURATION = 3  # seconds of data chunks received at a time
 
     def __init__(self, hotword="hey xxx", config=None):
@@ -312,15 +320,21 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
         self.expected_duration = self.MAX_EXPECTED_DURATION
         self.full_vocab = self.config.get("full_vocab", False)
         self.debug = self.config.get("debug", False)
+        self.lang = self.config.get("lang", Configuration().get("lang"))
         self.time_between_checks = min(self.config.get("time_between_checks", 1.0), 3)
         self._counter = 0
         self._load_model()
         # TODO refactor this, add native support to OPN
         self.bus = get_mycroft_bus()
-        self.buffer = ReadWriteStream(max_size=96000)  # 3 second buffer
+        self.buffer = bytearray()
 
     def update(self, chunk: bytes):
-        self.buffer.write(chunk)
+        # Each check transcribes the last 3 s, so a wake word that crosses a
+        # check boundary is still whole in the next window.
+        self.buffer += chunk
+        del self.buffer[:-BUFFER_BYTES]
+        # 16 kHz, 16-bit mono: the check interval counts audio time, not calls
+        self._counter += len(chunk) / 32000
 
     @property
     def langs(self):
@@ -349,7 +363,6 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
         """ frame data contains audio data that needs to be checked for a wake
         word, you can process audio here or just return a result
         previously handled in update method """
-        self._counter += self.SEC_BETWEEN_WW_CHECKS
         if self._counter < self.time_between_checks:
             return False
         self._counter = 0
@@ -360,7 +373,7 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
                 transcript = txs[lang]
             else:
                 try:
-                    self.model.process_audio(self.buffer.read(), lang)
+                    self.model.process_audio(bytes(self.buffer), lang)
                     transcript = self.model.get_final_transcription(lang)
                 except:
                     LOG.error(f"Failed to process audio for lang: {lang}")
@@ -373,7 +386,7 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
             rule = kw.get("rule") or MatchRule.EQUALS
             thresh = kw.get("threshold", 0.75)
             wakeup = kw.get("wakeup", False)
-            score = VoskWakeWordPlugin.score(transcript, samples, rule, thresh)
+            score = VoskWakeWordPlugin.score(transcript, samples, rule)
             found = score >= thresh
             if found:
                 LOG.info(f"Detected kw: {kw_name}")
