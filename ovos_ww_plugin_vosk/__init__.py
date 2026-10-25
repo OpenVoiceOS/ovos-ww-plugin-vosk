@@ -86,7 +86,7 @@ class ModelContainer:
                 model = KaldiRecognizer(KaldiModel(model_path), 16000)
             else:
                 model = KaldiRecognizer(KaldiModel(model_path), 16000,
-                                        json.dumps(samples or self.samples))
+                                        json.dumps(samples or self.samples, ensure_ascii=False))
             return model
         else:
             raise FileNotFoundError
