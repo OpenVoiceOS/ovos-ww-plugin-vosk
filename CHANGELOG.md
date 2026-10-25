@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.12a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.12a1) (2026-10-25)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.11a3...0.1.12a1)
+
+**Merged pull requests:**
+
+- fix: keep accented samples as written in the Vosk grammar [\#50](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/50) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+- Update Italian model URL to version 0.22 [\#38](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/38) ([denics](https://github.com/denics))
+
 ## [0.1.11a3](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.11a3) (2026-08-01)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.11a2...0.1.11a3)
