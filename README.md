@@ -41,6 +41,7 @@ in a number of ways.
 - `debug` - if true, prints extra info, like the transcript contents.
 - `rule` - how to compare the transcript against the samples. See the rules below.
 - `time_between_checks` - the length in seconds between inferences. Must be between 0.2 and 3.
+- `window_seconds` - the length in seconds of the most recent audio each inference transcribes. Maximum 3. The default is the plugin's `DEFAULT_WINDOW_SECONDS`.
 - `full_vocab` - use the full model vocabulary for transcription. If false (default), Vosk runs in keyword mode.
 - `samples` - list of samples to match the rules against. Optional; defaults to the keyword name.
 
@@ -75,11 +76,15 @@ You can define different rules to trigger a wake word.
 Enable the `debug` flag and check the logs to see what the plugin transcribes. Use
 this to tune the rule and samples.
 
-Each wake word must fit in 3 seconds, the length of audio the model parses at a time.
+Each wake word must fit in 3 seconds, the longest `window_seconds` allowed.
 
-`time_between_checks` controls how often the plugin checks the buffered audio.
-Lower values run more checks and use more CPU. Higher values check less often and may
-miss short wake words. The default is 1.0.
+The plugin keeps the last `window_seconds` of audio. After every `time_between_checks`
+seconds of new audio, it transcribes that whole window, so a check boundary does not
+split a wake word. The check interval counts audio received,
+whatever the chunk size. Lower `time_between_checks` values run more checks and use
+more CPU. Higher values check less often and may miss short wake words. The default is
+1.0. A longer `window_seconds` costs more CPU per check, and a `window_seconds` smaller than `time_between_checks` is raised to it. A window longer than `time_between_checks` catches more phrases but gives more false wake-ups on conversation than a window equal to it, which checks each stretch of audio once. After a detection the window
+is cleared, so one utterance triggers once.
 
 Set `full_vocab` to transcribe all known words before applying the detection rules. By
 default this is false, and the plugin only looks for the wake word samples. Depending
