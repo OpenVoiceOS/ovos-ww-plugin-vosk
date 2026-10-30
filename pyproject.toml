@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ovos-ww-plugin-vosk"
+dynamic = ["version"]
+description = "Kaldi/Vosk wake word plugin for OpenVoiceOS"
+license = {text = "Apache-2.0"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+authors = [{name = "JarbasAi", email = "jarbasai@mailfence.com"}]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy",
+    "vosk",
+    "ovos-plugin-manager>=2.1.1,<3.0.0",
+    "ovos-bus-client>=0.0.6",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "ovoscope",
+    "vosk",
+]
+
+[project.entry-points."opm.wake_word"]
+ovos-ww-plugin-vosk = "ovos_ww_plugin_vosk:VoskWakeWordPlugin"
+ovos-ww-plugin-vosk-multi = "ovos_ww_plugin_vosk:VoskMultiWakeWordPlugin"
+
+[project.urls]
+Homepage = "https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk"
+
+[tool.setuptools.dynamic]
+version = {attr = "ovos_ww_plugin_vosk.version.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ovos_ww_plugin_vosk*"]

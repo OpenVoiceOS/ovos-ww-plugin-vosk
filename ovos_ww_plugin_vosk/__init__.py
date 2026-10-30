@@ -26,7 +26,6 @@ from ovos_bus_client.message import Message
 from ovos_bus_client.util import get_mycroft_bus
 from ovos_plugin_manager.templates.hotwords import HotWordEngine
 from ovos_plugin_manager.utils.audio import AudioData
-from ovos_plugin_manager.utils import ReadWriteStream
 from ovos_utils.log import LOG
 from ovos_utils.parse import fuzzy_match, MatchStrategy
 from ovos_utils.xdg_utils import xdg_data_home
@@ -74,6 +73,11 @@ class ModelContainer:
         res = engine.FinalResult()
         return json.loads(res)["text"]
 
+    def reset(self):
+        # KaldiRecognizer.Reset() keeps the decoded frames, FinalResult() drops them
+        if self.engine:
+            self.engine.FinalResult()
+
     def process_audio(self, audio, lang=None):
         engine = self.get_engine(lang)
         if isinstance(audio, AudioData):
@@ -86,7 +90,7 @@ class ModelContainer:
                 model = KaldiRecognizer(KaldiModel(model_path), 16000)
             else:
                 model = KaldiRecognizer(KaldiModel(model_path), 16000,
-                                        json.dumps(samples or self.samples))
+                                        json.dumps(samples or self.samples, ensure_ascii=False))
             return model
         else:
             raise FileNotFoundError
@@ -137,7 +141,7 @@ class ModelContainer:
             "gr": "https://alphacephei.com/vosk/models/vosk-model-el-gr-0.7.zip",
             "tr": "https://alphacephei.com/vosk/models/vosk-model-small-tr-0.3.zip",
             "vn": "https://alphacephei.com/vosk/models/vosk-model-small-vn-0.3.zip",
-            "it": "https://alphacephei.com/vosk/models/vosk-model-small-it-0.4.zip",
+            "it": "https://alphacephei.com/vosk/models/vosk-model-small-it-0.22.zip",
             "nl": "https://alphacephei.com/vosk/models/vosk-model-nl-spraakherkenning-0.6-lgraph.zip",
             "ca": "https://alphacephei.com/vosk/models/vosk-model-small-ca-0.4.zip",
             "ar": "https://alphacephei.com/vosk/models/vosk-model-ar-mgb2-0.4.zip",
@@ -147,6 +151,7 @@ class ModelContainer:
         biglang2url = {
             "en": "https://alphacephei.com/vosk/models/vosk-model-en-us-aspire-0.2.zip",
             "en-in": "http://alphacephei.com/vosk/models/vosk-model-en-in-0.4.zip",
+            "it": "https://alphacephei.com/vosk/models/vosk-model-it-0.22.zip",
             "cn": "https://alphacephei.com/vosk/models/vosk-model-cn-0.1.zip",
             "ru": "https://alphacephei.com/vosk/models/vosk-model-ru-0.10.zip",
             "fr": "https://github.com/pguyot/zamia-speech/releases/download/20190930/kaldi-generic-fr-tdnn_f-r20191016.tar.xz",
@@ -164,10 +169,62 @@ class ModelContainer:
         return lang2url.get(lang)
 
 
-class VoskWakeWordPlugin(HotWordEngine):
+class RollingWindow:
+    """Keeps the last `window_seconds` of audio and counts the audio received
+    since the last check as an integer number of bytes."""
+    SAMPLE_RATE = 16000
+    SAMPLE_WIDTH = 2  # bytes per sample, 16 bit mono
+    MAX_SECONDS = 3  # every wake word fits in 3 seconds
+    DEFAULT_WINDOW_SECONDS = 2.0
+    MIN_CHECK_SECONDS = 0.2
+
+    def _init_window(self):
+        checks = self.config.get("time_between_checks", 1.0)
+        if checks < self.MIN_CHECK_SECONDS:
+            LOG.warning(f"time_between_checks ({checks}) is below "
+                        f"{self.MIN_CHECK_SECONDS}, using {self.MIN_CHECK_SECONDS}")
+        self.time_between_checks = min(max(checks, self.MIN_CHECK_SECONDS),
+                                       self.MAX_SECONDS)
+        self.window_seconds = min(
+            self.config.get("window_seconds", self.DEFAULT_WINDOW_SECONDS),
+            self.MAX_SECONDS)
+        if self.window_seconds < self.time_between_checks:
+            if "window_seconds" in self.config:
+                LOG.warning(f"window_seconds ({self.window_seconds}) is smaller "
+                            f"than time_between_checks, using "
+                            f"{self.time_between_checks}")
+            self.window_seconds = self.time_between_checks
+        self._check_bytes = self._seconds_to_bytes(self.time_between_checks)
+        self._window_bytes = self._seconds_to_bytes(self.window_seconds)
+        self._counter = 0  # bytes received since the last check
+        self.buffer = bytearray()
+
+    @classmethod
+    def _seconds_to_bytes(cls, seconds: float) -> int:
+        return round(seconds * cls.SAMPLE_RATE) * cls.SAMPLE_WIDTH
+
+    def update(self, chunk: bytes):
+        self.buffer += chunk
+        self._counter += len(chunk)
+        del self.buffer[:-self._window_bytes]
+
+    def _check_due(self) -> bool:
+        if self._counter < self._check_bytes:
+            return False
+        self._counter = 0
+        return True
+
+    def _window_audio(self) -> bytes:
+        return bytes(self.buffer[-self._window_bytes:])
+
+    def reset(self):
+        self.buffer.clear()
+        self._counter = 0
+        self.model.reset()
+
+
+class VoskWakeWordPlugin(RollingWindow, HotWordEngine):
     """Vosk Wake Word"""
-    # Hard coded values in mycroft/client/speech/mic.py
-    SEC_BETWEEN_WW_CHECKS = 0.2
     MAX_EXPECTED_DURATION = 3  # seconds of data chunks received at a time
 
     def __init__(self, hotword="hey mycroft", config=None):
@@ -180,12 +237,9 @@ class VoskWakeWordPlugin(HotWordEngine):
         self.thresh = self.config.get("threshold", 0.75)
         self.debug = self.config.get("debug", False)
         self.lang = self.config.get("lang", Configuration().get("lang"))
-        self.time_between_checks = \
-            min(self.config.get("time_between_checks", 1.0), 3)
         self.expected_duration = self.MAX_EXPECTED_DURATION
-        self._counter = 0
+        self._init_window()
         self._load_model()
-        self.buffer = ReadWriteStream(max_size=96000)  # 3 second buffer
 
     def _load_model(self):
         # model_folder for backwards compat
@@ -198,19 +252,14 @@ class VoskWakeWordPlugin(HotWordEngine):
         else:
             self.model.load_language(self.lang)
 
-    def update(self, chunk: bytes):
-        self.buffer.write(chunk)
-
     def found_wake_word(self) -> bool:
         """ frame data contains audio data that needs to be checked for a wake
         word, you can process audio here or just return a result
         previously handled in update method """
-        self._counter += self.SEC_BETWEEN_WW_CHECKS
-        if self._counter < self.time_between_checks:
+        if not self._check_due():
             return False
-        self._counter = 0
         try:
-            self.model.process_audio(self.buffer.read(), self.lang)
+            self.model.process_audio(self._window_audio(), self.lang)
             transcript = self.model.get_final_transcription(self.lang)
         except:
             LOG.error("Failed to process audio")
@@ -289,37 +338,35 @@ class MultiLangModelContainer(ModelContainer):
         model_path = self.download_language(lang)
         self.load_model(model_path, lang)
 
+    def reset(self):
+        for engine in self.engines.values():
+            engine.FinalResult()
+
     def unload_language(self, lang):
         if lang in self.engines:
             del self.engines[lang]
             self.engines.pop(lang)
 
 
-class VoskMultiWakeWordPlugin(HotWordEngine):
+class VoskMultiWakeWordPlugin(RollingWindow, HotWordEngine):
     """
      keeps multiple models in memory and runs detections for multiple wake words
      this avoids loading more than 1 model per language
      """
-    # Hard coded values in mycroft/client/speech/mic.py
-    SEC_BETWEEN_WW_CHECKS = 0.2
     MAX_EXPECTED_DURATION = 3  # seconds of data chunks received at a time
 
     def __init__(self, hotword="hey xxx", config=None):
         config = config or {}
         super().__init__(hotword, config)
         self.keywords = self.config.get("keywords", {})
+        self.lang = self.config.get("lang", Configuration().get("lang"))
         self.expected_duration = self.MAX_EXPECTED_DURATION
         self.full_vocab = self.config.get("full_vocab", False)
         self.debug = self.config.get("debug", False)
-        self.time_between_checks = min(self.config.get("time_between_checks", 1.0), 3)
-        self._counter = 0
+        self._init_window()
         self._load_model()
         # TODO refactor this, add native support to OPN
         self.bus = get_mycroft_bus()
-        self.buffer = ReadWriteStream(max_size=96000)  # 3 second buffer
-
-    def update(self, chunk: bytes):
-        self.buffer.write(chunk)
 
     @property
     def langs(self):
@@ -348,10 +395,9 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
         """ frame data contains audio data that needs to be checked for a wake
         word, you can process audio here or just return a result
         previously handled in update method """
-        self._counter += self.SEC_BETWEEN_WW_CHECKS
-        if self._counter < self.time_between_checks:
+        if not self._check_due():
             return False
-        self._counter = 0
+        audio = self._window_audio()
         txs = {}
         for kw_name, kw in self.keywords.items():
             lang = kw.get("lang") or self.lang
@@ -359,11 +405,12 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
                 transcript = txs[lang]
             else:
                 try:
-                    self.model.process_audio(self.buffer.read(), lang)
+                    self.model.process_audio(audio, lang)
                     transcript = self.model.get_final_transcription(lang)
                 except:
                     LOG.error(f"Failed to process audio for lang: {lang}")
                     continue
+                txs[lang] = transcript
             if not transcript or transcript == self.model.UNK:
                 continue
             if self.debug:
@@ -372,7 +419,7 @@ class VoskMultiWakeWordPlugin(HotWordEngine):
             rule = kw.get("rule") or MatchRule.EQUALS
             thresh = kw.get("threshold", 0.75)
             wakeup = kw.get("wakeup", False)
-            score = VoskWakeWordPlugin.score(transcript, samples, rule, thresh)
+            score = VoskWakeWordPlugin.score(transcript, samples, rule)
             found = score >= thresh
             if found:
                 LOG.info(f"Detected kw: {kw_name}")
