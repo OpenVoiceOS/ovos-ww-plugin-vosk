@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.13a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.13a1) (2026-10-30)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.12a1...0.1.13a1)
+
+**Merged pull requests:**
+
+- fix: advance the check clock by audio received and implement reset\(\) [\#52](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/pull/52) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [0.1.12a1](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/tree/0.1.12a1) (2026-10-25)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-ww-plugin-vosk/compare/0.1.11a3...0.1.12a1)
